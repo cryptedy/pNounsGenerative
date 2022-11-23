@@ -23,19 +23,21 @@ contract pNounsToken is pNounsContractFilter {
     uint256 public maxMintPerAddress = 100; // 1人当たりの最大ミント数
     // address public treasuryAddress = "0x8AE80e0B44205904bE18869240c2eC62D2342785"; // ミント代を転送する先のウォレット
     address public treasuryAddress = 0x0000000000000000000000000000000000000000; // ミント代を転送する先のウォレット
-    address[] pNoundersAddress = [
-        // pNounders配布用
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000,
-        0x0000000000000000000000000000000000000000
-    ];
     uint256 mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
-    uint256 mintForPNoundersAddress = 4; // pNoundersへの初回配布数
+
+    // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
+    // address[] pNoundersAddress = [
+    //     // pNounders配布用
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000,
+    //     0x0000000000000000000000000000000000000000
+    // ];
+    // uint256 mintForPNoundersAddress = 4; // pNoundersへの初回配布数
     mapping(address => uint256) public mintCount; // アドレスごとのミント数
 
     constructor(IAssetProvider _assetProvider, IProxyRegistry _proxyRegistry)
@@ -51,10 +53,11 @@ contract pNounsToken is pNounsContractFilter {
         mintLimit = 2100;
         admin = address(0); // TODO to be updated
 
-        for (uint256 i = 0; i < pNoundersAddress.length; i++) {
-            initMint(pNoundersAddress[i], mintForPNoundersAddress);
-            mintForTreasuryAddress -= mintForPNoundersAddress;
-        }
+    // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
+        // for (uint256 i = 0; i < pNoundersAddress.length; i++) {
+        //     initMint(pNoundersAddress[i], mintForPNoundersAddress);
+        //     mintForTreasuryAddress -= mintForPNoundersAddress;
+        // }
 
         initMint(treasuryAddress, mintForTreasuryAddress);
     }
