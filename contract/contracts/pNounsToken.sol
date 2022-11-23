@@ -6,28 +6,28 @@
 
 pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./pNounsContractFilter.sol";
 
 contract pNounsToken is pNounsContractFilter {
-    using Strings for uint256;
-
     enum SalePhase {
         Locked,
         PreSale1,
         PreSale2,
         PublicSale
     }
-    SalePhase public phase = SalePhase.Locked;
+    SalePhase public phase = SalePhase.Locked; // セールフェーズ
+    uint256 public purchaseUnit = 5; // 購入単位
 
     bytes32 public merkleRoot; // プレセールのマークルルート
-    uint256 public purchaseUnit = 5; // プレセール時の購入単位
     uint256 public maxMintPerAddress = 100; // 1人当たりの最大ミント数
     // address public treasuryAddress = "0x8AE80e0B44205904bE18869240c2eC62D2342785"; // ミント代を転送する先のウォレット
     address public treasuryAddress = 0x0000000000000000000000000000000000000000; // ミント代を転送する先のウォレット
     address[] pNoundersAddress = [
         // pNounders配布用
+        0x0000000000000000000000000000000000000000,
+        0x0000000000000000000000000000000000000000,
+        0x0000000000000000000000000000000000000000,
         0x0000000000000000000000000000000000000000,
         0x0000000000000000000000000000000000000000,
         0x0000000000000000000000000000000000000000,
@@ -46,7 +46,7 @@ contract pNounsToken is pNounsContractFilter {
             "pNouns"
         )
     {
-        description = "This is the first NFT of pNouns project (https://pnouns.wtf/). All images are dymically generated on the blockchain.";
+        description = "This is the first NFT of pNouns project (https://pnouns.wtf/).";
         mintPrice = 0.05 ether;
         mintLimit = 2100;
         admin = address(0); // TODO to be updated
@@ -62,47 +62,49 @@ contract pNounsToken is pNounsContractFilter {
     ////////// コンストラクタ用  /////////////
     function initMint(address _to, uint256 _num) private {
         if (_to != address(0)) {
-            // ミント
             for (uint256 i; i < _num; i++) {
                 _safeMint(_to, nextTokenId++);
             }
-            // ミント数カウントアップ
             mintCount[_to] += _num;
         }
     }
 
-    ////////// プレセール //////////
     function mint(
         uint256 _mintAmount, // ミント数
         bytes32[] calldata _merkleProof // マークルツリー
     ) public payable {
-        // セールフェイズチェック
-        if (phase == SalePhase.Locked) {
-            revert("Sale locked");
-        } else if (phase == SalePhase.PreSale1 || phase == SalePhase.PreSale2) {
-            // マークルツリーが正しいこと
-            bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+        // オーナーチェック
+        if (owner() != _msgSender() && admin != _msgSender()) {
+            // セールフェイズチェック
+            if (phase == SalePhase.Locked) {
+                revert("Sale locked");
+            } else if (
+                phase == SalePhase.PreSale1 || phase == SalePhase.PreSale2
+            ) {
+                // マークルツリーが正しいこと
+                bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+                require(
+                    MerkleProof.verify(_merkleProof, merkleRoot, leaf),
+                    "Invalid Merkle Proof"
+                );
+            }
+
+            // ミント数が購入単位と一致していること
+            require(_mintAmount % purchaseUnit == 0, "Invalid purchaseUnit");
+
+            // アドレスごとのミント数上限チェック
             require(
-                MerkleProof.verify(_merkleProof, merkleRoot, leaf),
-                "Invalid Merkle Proof"
+                mintCount[msg.sender] + _mintAmount <= maxMintPerAddress,
+                "exceeds number of earned Tokens"
             );
+
+            // ミント数に応じた ETHが送金されていること
+            uint256 cost = mintPrice * _mintAmount;
+            require(cost <= msg.value, "insufficient funds");
         }
 
         // 最大供給数に達していないこと
         require(totalSupply() + _mintAmount <= mintLimit, "Sold out");
-
-        // ミント数が購入単位と一致していること
-        require(_mintAmount % purchaseUnit == 0, "Invalid purchaseUnit");
-
-        // アドレスごとのミント数上限チェック
-        require(
-            mintCount[msg.sender] + _mintAmount <= maxMintPerAddress,
-            "exceeds number of earned Tokens"
-        );
-
-        // ミント数に応じた ETHが送金されていること
-        uint256 cost = mintPrice * _mintAmount;
-        require(cost <= msg.value, "insufficient funds");
 
         // ミント
         for (uint256 i; i < _mintAmount; i++) {
@@ -113,7 +115,9 @@ contract pNounsToken is pNounsContractFilter {
         mintCount[msg.sender] += _mintAmount;
 
         // トレジャリーに送金
-        payable(treasuryAddress).transfer(msg.value);
+        if (treasuryAddress != address(0) && msg.value > 0) {
+            payable(treasuryAddress).transfer(msg.value);
+        }
     }
 
     function setTreasuryAddress(address _treasury) external onlyAdmin {

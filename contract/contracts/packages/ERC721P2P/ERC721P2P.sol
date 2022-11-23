@@ -19,11 +19,11 @@ import "./opensea/DefaultOperatorFilterer.sol";
 
 // From https://github.com/ProjectOpenSea/operator-filter-registry/blob/main/src/example/ExampleERC721.sol
 abstract contract ERC721WithOperatorFilter is ERC721, DefaultOperatorFilterer {
-  function setApprovalForAll(address operator, bool approved) public override onlyAllowedOperatorApproval(operator) {
+  function setApprovalForAll(address operator, bool approved) public virtual override onlyAllowedOperatorApproval(operator) {
       super.setApprovalForAll(operator, approved);
   }
 
-  function approve(address operator, uint256 tokenId) public override onlyAllowedOperatorApproval(operator) {
+  function approve(address operator, uint256 tokenId) public virtual override onlyAllowedOperatorApproval(operator) {
       super.approve(operator, tokenId);
   }
 
