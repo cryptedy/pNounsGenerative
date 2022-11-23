@@ -7,12 +7,33 @@ dotenv.config();
 
 const getUrl = () => {
   return process.env.INFURA_API_KEY ?
-    "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY : 
+    "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY :
     "https://eth-rinkeby.alchemyapi.io/v2/" + process.env.ALCHEMY_API_KEY
 };
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        // Toggles whether the optimizer is on or off. 
+        // It's good to keep it off for development 
+        // and turn on for when getting ready to launch.
+        enabled: true,
+        // The number of runs specifies roughly how often 
+        // the deployed code will be executed across the 
+        // life-time of the contract.
+        runs: 800,
+        details: {
+          yul: true,
+          yulDetails: {
+            stackAllocation: true,
+            optimizerSteps: "dhfoDgvulfnTUtnIf"
+          }
+        }
+      }
+    }
+  },
   defaultNetwork: "localhost",
   networks: {
     mumbai: {
