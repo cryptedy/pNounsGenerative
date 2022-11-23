@@ -1,0 +1,103 @@
+# githubプロジェクト
+https://github.com/EibaKatsu/pNounsGenerative
+
+# npm 初期化
+npm init --yes
+
+# githubリポジトリからクローン作成
+git clone git@github.com:EibaKatsu/pNounsGenerative.git
+
+
+# hardhatをインストール
+npm install --save-dev hardhat
+
+# dotenv インストール
+npm install dotenv
+
+# openzeppelinをインストール
+npm install @openzeppelin/contracts
+
+# typescryptインストール
+npm install --save-dev typescript
+
+# .envの作成
+INFURA_API_KEY=""
+ALCHEMY_API_KEY=""
+PRIVATE_KEY=""
+ETHERSCAN_API_KEY=""
+
+(参考)https://qiita.com/Nossa/items/ace2ab802adc85f86b20
+# フォーク元のリポジトリをリモートブランチに追加
+git remote add upstream https://github.com/Cryptocoders-wtf/generative.git
+
+# リモートブランチの一覧
+git remote -v
+
+# フォーク元の master ブランチの変更差分をフェッチます。
+# ※upstream/master に保管されます
+git fetch upstream
+
+# masterブランチをチェックアウトしフォーク元の差分をマージします。
+git checkout main
+git merge upstream/main
+
+# 最後に自分の修正ブランチに master ブランチを取り込みます。コンフリクトが出たら解決します。
+git checkout 自分の修正ブランチ
+git merge master
+
+
+# hardhat ローカルの起動
+npx hardhat node
+
+# テスト
+npx hardhat test
+npx hardhat test test/pNounsToken.ts
+
+# テストに必要なライブラリ
+npm install merkletreejs
+npm install keccak256 
+
+# 中島さんのやつ
+npm i fully-on-chain.sol  
+
+# ContractAllowList
+npm i contract-allow-list
+
+
+# pNounsTokenコントラクト仕様
+■全般
+・合計2,100枚まで発行可能(運営への初期配布含む)
+・1枚当たりの価格は0.05ETH
+・アドレスごとの最大ミント数は100まで(プレセール／パブリックセール合計)
+・画像はリビール前後で入れ替え可能
+
+■コンストラクタ(初期処理)
+・運営用に100枚を確保
+　・各pNounsMemberへ4枚ずつミント
+　・残りをトレジャリーアドレスへミント
+
+■プレセール1
+・AL登録者のみミント可能(マークルツリーで実装)
+・ミント数は5,10,15,...の5枚単位で 100枚まで指定可能(アドレスごとの最大ミント数は100)
+・送金されたETHは、即トレジャリーウォレットへ送金
+
+■プレセール2
+・AL登録者のみミント可能(マークルツリーで実装) * AL対象者はプレセール1と同じ
+・ミント数は1,2,3,...の1枚単位で 100枚まで指定可能(アドレスごとの最大ミント数は100)
+・送金されたETHは、即トレジャリーウォレットへ送金
+
+■パブリックセール
+・誰でもミント可能
+・ミント数は1,2,3,...の1枚単位で 100枚まで指定可能(アドレスごとの最大ミント数は100)
+・送金されたETHは、即トレジャリーウォレットへ送金
+
+■その他
+・OpenseaのOperatorFilter(ロイヤリティーのやつ)を実装
+・詐欺対策のため、信用したマーケットプレイス以外を制御
+・将来の独自マーケットプレイスのため、中島さん提唱のERC721P2Pを実装
+
+
+
+
+# macOSバージョンアップ後 
+xcode-select --install
