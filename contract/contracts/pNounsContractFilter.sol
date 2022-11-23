@@ -6,13 +6,11 @@
 
 pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "./libs/ProviderToken.sol";
 import "contract-allow-list/contracts/proxy/interface/IContractAllowListProxy.sol";
 
 // contract pNounsToken is ProviderToken, ERC721P2P {
 contract pNounsContractFilter is ProviderToken {
-    using Strings for uint256;
 
     address public admin; // コントラクト管理者。オーナーか管理者がset系メソッドを実行可能
 
