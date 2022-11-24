@@ -107,63 +107,34 @@ describe("pNounsToken constant values", function () {
   });
 });
 
-describe("pNounsToken preSale1", function () {
-  it("set phase", async function () {
-    await token.functions.setPhase(1, 5);
+describe("pNounsToken owner's mint", function () {
+  it("normal pattern", async function () {
+    await token.functions.setPhase(0, 5);
     const [phase] = await token.functions.phase();
-    expect(phase).equal(1);
+    expect(phase).equal(0);
     const [purchaseUnit] = await token.functions.purchaseUnit();
     expect(purchaseUnit).equal(5)
     const [mintPrice] = await token.functions.mintPrice();
     expect(mintPrice).equal(ethers.utils.parseEther("0.05"));
-  });
 
-  it("set phase", async function () {
-    const [count] = await token.functions.totalSupply();
-    expect(count.toNumber()).equal(0);
-    const [mintPrice] = await token.functions.mintPrice();
-    const tx = await token.functions.mint({ value: mintPrice });
+    // ownerを含まないマークルツリー
+    const tree = createTree([{ address: authorized.address }]);
+    await token.functions.setMerkleRoot(tree.getHexRoot());
+
+    // ownerのマークルリーフ
+    const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [owner.address]));
+
+    // 購入単位以外, ETHなしでmint
+    const tx = await token.connect(authorized).functions.presaleMint(5,proof,{ value: mintPrice.mul(5) });
+    const tx = await token.functions.mint(3, proof, { value: 0 });
     await tx.wait();
+
     const [count1] = await token.functions.balanceOf(owner.address);
-    expect(count1.toNumber()).equal(1);
+    expect(count1.toNumber()).equal(3);
     const [count2] = await token.functions.totalSupply();
-    expect(count2.toNumber()).equal(1);
+    expect(count2.toNumber()).equal(3);
   });
-  it("sold out error", async function () {
-    const [count] = await token.functions.totalSupply();
-    const tx = await token.setMintLimit(count);
-    await tx.wait();
-    const [mintPrice] = await token.functions.mintPrice();
-    const err = await catchError(async () => {
-      const tx2 = await token.functions.mint({ value: mintPrice });
-      await tx2.wait();
-    });
-    expect(err).equal(true);
 
-    const tx3 = await token.setMintLimit(250);
-    await tx3.wait();
-  });
-  it("mint with wrong price", async function () {
-    const [mintPrice] = await token.functions.mintPrice();
-    const halfPrice = mintPrice.div(ethers.BigNumber.from(2));
-    const err = await catchError(async () => {
-      const tx = await token.functions.mint({ value: halfPrice });
-      await tx.wait();
-    });
-    expect(err).equal(true);
-  });
-  it("mint with whitelist token", async function () {
-    const tx0 = await testToken.mint();
-    await tx0.wait();
-
-    const [mintPrice] = await token.functions.mintPrice();
-    const halfPrice = mintPrice.div(ethers.BigNumber.from(2));
-    const [myMintPrice] = await token.functions.mintPriceFor(owner.address);
-    expect(myMintPrice).equal(halfPrice);
-
-    const tx = await token.functions.mint({ value: halfPrice });
-    await tx.wait();
-  });
 });
 
 
