@@ -41,8 +41,9 @@ const catchError = async (callback: any) => {
     await callback();
     console.log("unexpected success");
     return false;
-  } catch (e: any) {
-    return true;
+  } catch(e:any) {
+    const array = e.reason.split("'");
+    return array.length == 3 ? array[1] : true;
   }
 };
 
@@ -69,8 +70,6 @@ describe("pNounsToken constant values", function () {
     await tx.wait();
     const [mintLimit2] = await token.functions.mintLimit();
     expect(mintLimit2.toNumber()).equal(500);
-    const tx2 = await token.setMintLimit(250);
-    await tx2.wait();
   });
   it("mintPrice", async function () {
     const [mintPrice] = await token.functions.mintPrice();
@@ -125,9 +124,9 @@ describe("pNounsToken owner's mint", function () {
     const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [owner.address]));
 
     // 購入単位以外, ETHなしでmint
-    const tx = await token.connect(authorized).functions.presaleMint(5,proof,{ value: mintPrice.mul(5) });
-    const tx = await token.functions.mint(3, proof, { value: 0 });
-    await tx.wait();
+    // const tx = await token.connect(authorized).functions.mint(5,proof,{ value: mintPrice.mul(5) });
+    await token.functions.mintPNouns(3, proof, { value: 0 });
+    // await tx.wait();
 
     const [count1] = await token.functions.balanceOf(owner.address);
     expect(count1.toNumber()).equal(3);
@@ -135,8 +134,50 @@ describe("pNounsToken owner's mint", function () {
     expect(count2.toNumber()).equal(3);
   });
 
-});
+  it("sold out", async function () {
+    let tx, err;
+    await token.functions.setPhase(0, 5);
+    const [phase] = await token.functions.phase();
+    expect(phase).equal(0);
+    const [purchaseUnit] = await token.functions.purchaseUnit();
+    expect(purchaseUnit).equal(5)
+    const [mintPrice] = await token.functions.mintPrice();
+    expect(mintPrice).equal(ethers.utils.parseEther("0.05"));
+    const [count] = await token.functions.totalSupply();
+    const [mintLimit] = await token.functions.mintLimit();
 
+    // ownerを含まないマークルツリー
+    const tree = createTree([{ address: authorized.address }]);
+    await token.functions.setMerkleRoot(tree.getHexRoot());
+
+    // ownerのマークルリーフ
+    const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [owner.address]));
+
+    // 購入単位以外, ETHなしでmint
+    // const tx = await token.connect(authorized).functions.mint(5,proof,{ value: mintPrice.mul(5) });
+    // await token.functions.mintPNouns(2101, proof, { value: 0 });
+    // await tx.wait();
+
+    err = await catchError(async () => {
+      // 最大供給量を超過
+      tx = await token.functions.mintPNouns(mintLimit.toNumber() + 1, proof, { value: 0 });
+      await tx.wait();
+    });
+    // console.log("err", err);
+    expect(err).equal('Sold out');
+
+  });
+
+  // it("Attempt to buy by user2", async function() {
+  //   err = await catchError(async () => {
+  //     tx = await token2.purchase(0, user2.address, zeroAddress);
+  //     await tx.wait();
+  //   });
+  //   expect(err).equal('Token is not on sale');
+  // });
+
+
+});
 
 /**
  * https://github.com/Lavulite/ERC721MultiSale/blob/main/utils/merkletree.ts より
