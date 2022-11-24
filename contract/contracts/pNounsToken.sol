@@ -72,10 +72,10 @@ contract pNounsToken is pNounsContractFilter {
         }
     }
 
-    function mint(
+    function mintPNouns(
         uint256 _mintAmount, // ミント数
         bytes32[] calldata _merkleProof // マークルツリー
-    ) public payable {
+    ) external payable {
         // オーナーチェック
         if (owner() != _msgSender() && admin != _msgSender()) {
             // セールフェイズチェック
