@@ -3,8 +3,6 @@ import { ethers } from "hardhat";
 import { MerkleTree } from 'merkletreejs'
 import keccak256 from 'keccak256'
 
-export const proxy = "0xa5409ec958c83c3f309868babaca7c86dcb077c1";
-
 let assetTokenGate: any;
 let contractHelper: any;
 let contractSplatter: any;
@@ -30,7 +28,7 @@ before(async () => {
   await contractArt.deployed();
 
   const factoryToken = await ethers.getContractFactory("pNounsToken");
-  token = await factoryToken.deploy(contractArt.address, proxy);
+  token = await factoryToken.deploy(contractArt.address);
   await token.deployed();
 
   [owner, authorized, unauthorized, treasury] = await ethers.getSigners();

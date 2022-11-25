@@ -6,11 +6,11 @@
 
 pragma solidity ^0.8.6;
 
-import "./libs/ProviderToken.sol";
+import "./libs/ProviderToken2.sol";
 import "contract-allow-list/contracts/proxy/interface/IContractAllowListProxy.sol";
 
 // contract pNounsToken is ProviderToken, ERC721P2P {
-contract pNounsContractFilter is ProviderToken {
+contract pNounsContractFilter is ProviderToken2 {
 
     address public admin; // コントラクト管理者。オーナーか管理者がset系メソッドを実行可能
 
@@ -19,12 +19,10 @@ contract pNounsContractFilter is ProviderToken {
 
     constructor(
         IAssetProvider _assetProvider,
-        IProxyRegistry _proxyRegistry,
         string memory _title,
         string memory _shortTitle
     )
-        // ERC721P2P(payable(_artist))
-        ProviderToken(_assetProvider, _proxyRegistry, _title, _shortTitle)
+        ProviderToken2(_assetProvider, _title, _shortTitle)
     {}
 
     ////////// modifiers //////////
@@ -43,11 +41,11 @@ contract pNounsContractFilter is ProviderToken {
     }
 
     ////////////// CAL 関連 ////////////////
-    function setCalContract(IContractAllowListProxy _cal) external onlyAdmin {
+    function setCalContract(IContractAllowListProxy _cal) external onlyAdminOrOwner {
         cal = _cal;
     }
 
-    function setCalLevel(uint256 _value) external onlyAdmin {
+    function setCalLevel(uint256 _value) external onlyAdminOrOwner {
         calLevel = _value;
     }
 

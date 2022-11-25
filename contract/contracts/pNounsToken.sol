@@ -40,10 +40,9 @@ contract pNounsToken is pNounsContractFilter {
     // uint256 mintForPNoundersAddress = 4; // pNoundersへの初回配布数
     mapping(address => uint256) public mintCount; // アドレスごとのミント数
 
-    constructor(IAssetProvider _assetProvider, IProxyRegistry _proxyRegistry)
+    constructor(IAssetProvider _assetProvider)
         pNounsContractFilter(
             _assetProvider,
-            _proxyRegistry,
             "pNouns NFT",
             "pNouns"
         )
@@ -123,25 +122,25 @@ contract pNounsToken is pNounsContractFilter {
         }
     }
 
-    function setTreasuryAddress(address _treasury) external onlyAdmin {
+    function setTreasuryAddress(address _treasury) external onlyAdminOrOwner {
         treasuryAddress = _treasury;
     }
 
     function setPhase(SalePhase _phase, uint256 _purchaseUnit)
         external
-        onlyAdmin
+        onlyAdminOrOwner
     {
         phase = _phase;
         purchaseUnit = _purchaseUnit;
     }
 
-    function setMerkleRoot(bytes32 _merkleRoot) external onlyAdmin {
+    function setMerkleRoot(bytes32 _merkleRoot) external onlyAdminOrOwner {
         merkleRoot = _merkleRoot;
     }
 
     function setMaxMintPerAddress(uint256 _maxMintPerAddress)
         external
-        onlyAdmin
+        onlyAdminOrOwner
     {
         maxMintPerAddress = _maxMintPerAddress;
     }
