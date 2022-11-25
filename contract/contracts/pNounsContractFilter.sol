@@ -28,7 +28,7 @@ contract pNounsContractFilter is ProviderToken {
     {}
 
     ////////// modifiers //////////
-    modifier onlyAdmin() {
+    modifier onlyAdminOrOwner() {
         require(
             owner() == _msgSender() || admin == _msgSender(),
             "caller is not the admin"
