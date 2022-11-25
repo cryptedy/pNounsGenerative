@@ -39,10 +39,14 @@ import { addresses as matrix_mainet } from "./addresses/matrix_mainnet";
 import { addresses as alphabet_mumbai } from "./addresses/alphabet_mumbai";
 import { addresses as alphabet_localhost } from "./addresses/alphabet_localhost";
 import { addresses as alphabet_mainnet } from "./addresses/alphabet_mainnet";
+import { addresses as alphabet_goerli } from "./addresses/alphabet_goerli";
 import { addresses as alphatoken_mumbai } from "./addresses/alphatoken_mumbai";
 import { addresses as alphatoken_localhost } from "./addresses/alphatoken_localhost";
+import { addresses as alphatoken_goerli } from "./addresses/alphatoken_goerli";
+import { addresses as alphatoken_mainnet } from "./addresses/alphatoken_mainnet";
 import { addresses as dynamic_mumbai } from "./addresses/dynamic_mumbai";
 import { addresses as dynamic_mainnet } from "./addresses/dynamic_mainnet";
+import { addresses as dynamic_goerli } from "./addresses/dynamic_goerli";
 
 export const addresses: any = {
   svgHelper: {
@@ -183,13 +187,17 @@ export const addresses: any = {
     localhost: alphabet_localhost.alphabetProvider,
     mumbai: alphabet_mumbai.alphabetProvider,
     mainnet: alphabet_mainnet.alphabetProvider,
+    goerli: alphabet_goerli.alphabetProvider,
   },
   alphabetToken: {
     localhost: alphatoken_localhost.alphatoken,
-    mumbai: alphatoken_mumbai.alphatoken
+    mumbai: alphatoken_mumbai.alphatoken,
+    goerli: alphatoken_goerli.alphatoken,
+    mainnet: alphatoken_mainnet.alphatoken,
   },
   dynamic: {
     mumbai: dynamic_mumbai.tokenGate,
     mainnet: dynamic_mainnet.tokenGate,
+    goerli: dynamic_goerli.tokenGate,
   }
 };

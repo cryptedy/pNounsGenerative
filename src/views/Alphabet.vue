@@ -1,12 +1,13 @@
 <template>
   <div class="mx-auto max-w-3xl p-2 text-left">
     <p>Images from the on-chain asset provider.</p>
-    <ProviderView assetProvider="alphabet" network="mumbai" />
+    <ProviderView assetProvider="alphabet" :count="4" network="mainnet" />
     <Mint
       :network="network"
       :tokenGated="true"
       :tokenAddress="tokenAddress"
       :tokenGateAddress="tokenGateAddress"
+      :limit="1"
       :restricted="'On-Chain Splatter or Bitcoin Art'"
     />
   </div>
@@ -27,7 +28,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const network =
-      typeof route.query.network == "string" ? route.query.network : "mumbai";
+      typeof route.query.network == "string" ? route.query.network : "mainnet";
     const tokenAddress = addresses.alphabetToken[network];
     const tokenGateAddress = addresses.dynamic[network];
     console.log("*** chainId", network, tokenAddress);
