@@ -21,8 +21,8 @@ contract pNounsToken is pNounsContractFilter {
 
     bytes32 public merkleRoot; // プレセールのマークルルート
     uint256 public maxMintPerAddress = 100; // 1人当たりの最大ミント数
-    // address public treasuryAddress = "0x8AE80e0B44205904bE18869240c2eC62D2342785"; // ミント代を転送する先のウォレット
-    address public treasuryAddress = 0x0000000000000000000000000000000000000000; // ミント代を転送する先のウォレット
+    // address public treasuryAddress = "0x8AE80e0B44205904bE18869240c2eC62D2342785"; // ミント代を転送する先のウォレット(gnosis)
+    address public treasuryAddress = 0x52A76a606AC925f7113B4CC8605Fe6bCad431EbB; // テスト用
     uint256 mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
 
     // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。

@@ -3,10 +3,8 @@ import { ethers } from "hardhat";
 import { MerkleTree } from 'merkletreejs'
 import keccak256 from 'keccak256'
 
-let assetTokenGate: any;
 let contractHelper: any;
 let contractSplatter: any;
-let testToken: any; // dummy token to test tokenGate
 let contractArt: any;
 let token: any;
 let owner: any;

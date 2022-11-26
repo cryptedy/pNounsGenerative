@@ -2,11 +2,9 @@ import { ethers, network } from "hardhat";
 import { writeFile } from "fs";
 import { addresses } from "../../src/utils/addresses";
 
-const alphabet = addresses.alphabet[network.name];
-const tokengate = addresses.splatter[network.name];
+const pnouns = addresses.pnouns[network.name];
 
-console.log("alphabet", alphabet);
-console.log("tokengate", tokengate);
+console.log("pnouns", pnouns);
 
 const waitForUserInput = (text: string) => {
   return new Promise((resolve, reject) => {
@@ -17,17 +15,17 @@ const waitForUserInput = (text: string) => {
 };
 
 async function main() {
-  const factoryToken = await ethers.getContractFactory("AlphabetToken");
-  const token = await factoryToken.deploy(tokengate, alphabet);
+  const factoryToken = await ethers.getContractFactory("pNounsToken");
+  const token = await factoryToken.deploy(pnouns);
   await token.deployed();
   console.log(`      token="${token.address}"`);
 
   const addresses = `export const addresses = {\n`
-    + `  alphatoken:"${token.address}"\n`
+    + `  pnounstoken:"${token.address}"\n`
     + `}\n`;
-  await writeFile(`../src/utils/addresses/alphatoken_${network.name}.ts`, addresses, ()=>{});
+  await writeFile(`../src/utils/addresses/pnounstoken_${network.name}.ts`, addresses, ()=>{});
 
-  console.log(`npx hardhat verify ${token.address} ${tokengate} ${alphabet} --network ${network.name}`);  
+  console.log(`npx hardhat verify ${token.address} ${pnouns} --network ${network.name}`);  
 }
 
 main().catch((error) => {
