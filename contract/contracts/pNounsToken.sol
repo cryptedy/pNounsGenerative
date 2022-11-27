@@ -22,7 +22,7 @@ contract pNounsToken is pNounsContractFilter {
     bytes32 public merkleRoot; // プレセールのマークルルート
     uint256 public maxMintPerAddress = 100; // 1人当たりの最大ミント数
     // address public treasuryAddress = "0x8AE80e0B44205904bE18869240c2eC62D2342785"; // ミント代を転送する先のウォレット(gnosis)
-    address public treasuryAddress = 0x52A76a606AC925f7113B4CC8605Fe6bCad431EbB; // テスト用
+    address public treasuryAddress = 0x6Be0E4e7798430d92FE5e504B77F02C647D3eD23; // テスト用(gnosisテストネット)
     uint256 mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
 
     // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
@@ -41,18 +41,14 @@ contract pNounsToken is pNounsContractFilter {
     mapping(address => uint256) public mintCount; // アドレスごとのミント数
 
     constructor(IAssetProvider _assetProvider)
-        pNounsContractFilter(
-            _assetProvider,
-            "pNouns NFT",
-            "pNouns"
-        )
+        pNounsContractFilter(_assetProvider, "pNouns NFT", "pNouns")
     {
         description = "This is the first NFT of pNouns project (https://pnouns.wtf/).";
         mintPrice = 0.05 ether;
         mintLimit = 2100;
         admin = address(0); // TODO to be updated
 
-    // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
+        // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
         // for (uint256 i = 0; i < pNoundersAddress.length; i++) {
         //     initMint(pNoundersAddress[i], mintForPNoundersAddress);
         //     mintForTreasuryAddress -= mintForPNoundersAddress;
@@ -116,10 +112,20 @@ contract pNounsToken is pNounsContractFilter {
         // ミント数カウントアップ
         mintCount[msg.sender] += _mintAmount;
 
-        // トレジャリーに送金
-        if (treasuryAddress != address(0) && msg.value > 0) {
-            payable(treasuryAddress).transfer(msg.value);
-        }
+        // 潜在的な脆弱性リスク回避のため、withdraw関数を別途設ける
+        // // トレジャリーに送金
+        // if (treasuryAddress != address(0) && msg.value > 0) {
+        //     payable(treasuryAddress).transfer(msg.value);
+        // }
+    }
+
+    function withdraw() external onlyAdminOrOwner {
+        require(
+            treasuryAddress != address(0),
+            "treasuryAddress shouldn't be 0"
+        );
+        (bool sent, ) = treasuryAddress.call{value: address(this).balance}("");
+        require(sent, "failed to move fund to treasuryAddress contract");
     }
 
     function setTreasuryAddress(address _treasury) external onlyAdminOrOwner {

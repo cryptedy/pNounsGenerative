@@ -99,6 +99,9 @@ npm i contract-allow-list
 ・将来の独自マーケットプレイスのため、中島さん提唱のERC721P2Pを実装
 
 
+# withdrawのCommon Pattern
+https://solidity-jp.readthedocs.io/ja/latest/common-patterns.html
+
 
 
 # macOSバージョンアップ後 
