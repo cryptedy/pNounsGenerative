@@ -3,6 +3,8 @@ node_modules
 /dist
 /src/generated
 /.firebase
+.deps
+artifacts
 
 # local env files
 .env.local
@@ -24,3 +26,6 @@ pnpm-debug.log*
 *.sw?
 
 *~
+pNounsToken_flat.sol
+scripts/etherscan/receiptStatus.ts
+scripts/etherscan/verify.ts

@@ -111,6 +111,7 @@ describe("pNounsToken owner's mint", function () {
     expect(purchaseUnit).equal(5)
     const [mintPrice] = await token.functions.mintPrice();
     expect(mintPrice).equal(ethers.utils.parseEther("0.05"));
+    const [totalSupply] = await token.functions.totalSupply();
 
     // ownerを含まないマークルツリー
     const tree = createTree([{ address: authorized.address }]);
@@ -127,7 +128,7 @@ describe("pNounsToken owner's mint", function () {
     const [count1] = await token.functions.balanceOf(owner.address);
     expect(count1.toNumber()).equal(3);
     const [count2] = await token.functions.totalSupply();
-    expect(count2.toNumber()).equal(3);
+    expect(count2.toNumber()).equal(Number(totalSupply) + 3);
   });
 
   it("sold out", async function () {
