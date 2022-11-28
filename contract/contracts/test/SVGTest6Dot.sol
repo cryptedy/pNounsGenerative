@@ -15,7 +15,7 @@ import "../packages/graphics/Path.sol";
 import "../packages/graphics/SVG.sol";
 import "hardhat/console.sol";
 
-contract SVGTest {
+contract SVGTest6Dot {
   using Strings for uint256;
   using Randomizer for Randomizer.Seed;
   using Vector for Vector.Struct;
@@ -27,19 +27,49 @@ contract SVGTest {
     SVG.Element[] memory samples = new SVG.Element[](16);
     SVG.Element[] memory uses = new SVG.Element[](16);
 
-    samples[0] = SVG.rect(256, 256, 512, 512);
+    samples[0] = SVG.group(
+      SVG.group([
+        SVG.circle(16, 16, 16),
+        SVG.circle(48, 16, 16),
+        SVG.circle(80, 16, 16),
+        SVG.circle(112, 16, 16)
+      ]).id("dot32_4")
+    );
 
-    samples[1] = SVG.rect(256, 256, 512, 512)
-                      .fill("yellow");
+    samples[1] = SVG.group(
+      SVG.group([
+        SVG.use("dot32_4"),
+        SVG.use("dot32_4").transform("translate(128 0)"),
+        SVG.use("dot32_4").transform("translate(256 0)"),
+        SVG.use("dot32_4").transform("translate(384 0)"),
+        SVG.use("dot32_4").transform("translate(512 0)"),
+        SVG.use("dot32_4").transform("translate(640 0)"),
+        SVG.use("dot32_4").transform("translate(768 0)"),
+        SVG.use("dot32_4").transform("translate(896 0)")
+     ]).id("dot32_32")
+    );
 
-    samples[2] = SVG.rect(256, 256, 512, 512)
-                      .fill("yellow")
-                      .stroke("blue", 10);
+    samples[2] = SVG.group(
+      SVG.group([
+        SVG.use("dot32_32"),
+        SVG.use("dot32_32").transform("translate(0 32)"),
+        SVG.use("dot32_32").transform("translate(0 64)"),
+        SVG.use("dot32_32").transform("translate(0 96)")
+      ]).id("dot32_128")
+    );
 
-    samples[3] = SVG.rect(256, 256, 512, 512)
-                      .fill("yellow")
-                      .stroke("blue", 10)
-                      .transform("rotate(30 512 512)");
+    samples[3] = SVG.group(
+      SVG.group([
+        SVG.use("dot32_128"),
+        SVG.use("dot32_128").transform("translate(0 128)"),
+        SVG.use("dot32_128").transform("translate(0 256)"),
+        SVG.use("dot32_128").transform("translate(0 384)"),
+        SVG.use("dot32_128").transform("translate(0 512)"),
+        SVG.use("dot32_128").transform("translate(0 640)"),
+        SVG.use("dot32_128").transform("translate(0 768)"),
+        SVG.use("dot32_128").transform("translate(0 896)")
+      ]).id("dot32_1024")
+    );
 
     samples[4] = SVG.circle(512, 512, 300)
                       .fill("blue");

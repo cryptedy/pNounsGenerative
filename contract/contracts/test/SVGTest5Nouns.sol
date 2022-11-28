@@ -17,6 +17,7 @@ import "../packages/graphics/SVG.sol";
 import "../packages/graphics/Text.sol";
 import "hardhat/console.sol";
 import "assetprovider.sol/IAssetProvider.sol";
+import "../providers/NounsAssetProvider.sol";
 
 contract SVGTest5Nouns {
   using Strings for uint256;
@@ -27,10 +28,12 @@ contract SVGTest5Nouns {
   using TX for string;
   using Trigonometry for uint;
 
-  IAssetProvider nouns;
+  NounsAssetProvider nouns;
+  IAssetProvider dotNouns;
 
-  constructor(IAssetProvider _nouns) {
+  constructor(NounsAssetProvider _nouns, IAssetProvider _dotNouns) {
     nouns = _nouns;
+    dotNouns = _dotNouns;
   }
 
   function main() external view returns(string memory output) {
@@ -44,11 +47,13 @@ contract SVGTest5Nouns {
 
     string memory svgPart;
     string memory svgId;
-    (svgPart, svgId) = nouns.generateSVGPart(0);
-
+    (svgPart, svgId) = nouns.getNounsSVGPart(245);
     samples[1] = SVG.group(bytes(svgPart));
+    (svgPart, svgId) = dotNouns.generateSVGPart(0);
+    samples[2] = SVG.group(bytes(svgPart));
+    samples[3] = SVG.use(svgId);
 
-    for (uint i=0; i<2; i++) {
+    for (uint i=0; i<4; i++) {
       int x = int(256 * (i % 4));
       int y = int(256 * (i / 4));
       string memory tag = string(abi.encodePacked("test", i.toString()));

@@ -12,11 +12,17 @@ pragma solidity ^0.8.6;
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import "assetprovider.sol/IAssetProvider.sol";
 import '@openzeppelin/contracts/interfaces/IERC165.sol';
+import "../providers/NounsAssetProvider.sol";
+import "../packages/graphics/SVG.sol";
 
 contract DotProvider is IAssetProvider, IERC165, Ownable {
-  IAssetProvider public provider;
+  using Vector for Vector.Struct;
+  using Path for uint[];
+  using SVG for SVG.Element;
 
-  constructor(IAssetProvider _provider) {
+  NounsAssetProvider public provider;
+
+  constructor(NounsAssetProvider _provider) {
     provider = _provider;
   }
 
@@ -36,7 +42,7 @@ contract DotProvider is IAssetProvider, IERC165, Ownable {
   }
 
   function totalSupply() external view override returns(uint256) {
-    return provider.totalSupply(); 
+    return provider.getNounsTotalSuppy(); 
   }
 
   function processPayout(uint256 _assetId) external override payable {
@@ -48,18 +54,55 @@ contract DotProvider is IAssetProvider, IERC165, Ownable {
   }
 
   function generateSVGPart(uint256 _assetId) external view override returns(string memory svgPart, string memory tag) {
-    (svgPart, tag) = provider.generateSVGPart(_assetId);
-    svgPart = string(abi.encodePacked(svgPart,
-      '<pattern id="dot32patten" x="0" y="0" width="0.03125" height=".03125">'
-      '<rect width="32" height="32" fill="black"/>'
-      '<circle cx="16" cy="16" r="16" fill="white"/>'
-      '</pattern>'
-      '<mask id="dot32mask">'
-      '<rect fill="url(#dot32patten)" stroke="black" width="100%" height="100%"/>'
-      '</mask>'
-      '<g id="', tag, '_dot32">'
-      '<use href="#',tag,'" mask="url(#dot32mask)"/>'
-      '</g>'));
-    tag = string(abi.encodePacked(tag, '_dot32'));  
+    string memory tag0;
+    (svgPart, tag0) = provider.getNounsSVGPart(_assetId);
+    tag = string(abi.encodePacked(tag, '_dot32'));
+
+    svgPart = string(SVG.list([
+      SVG.element(bytes(svgPart)),
+      SVG.group([
+        SVG.circle(16, 16, 16),
+        SVG.circle(48, 16, 16),
+        SVG.circle(80, 16, 16),
+        SVG.circle(112, 16, 16)
+      ]).id("dot32_4"),
+      SVG.group([
+        SVG.use("dot32_4"),
+        SVG.use("dot32_4").transform("translate(128 0)"),
+        SVG.use("dot32_4").transform("translate(256 0)"),
+        SVG.use("dot32_4").transform("translate(384 0)"),
+        SVG.use("dot32_4").transform("translate(512 0)"),
+        SVG.use("dot32_4").transform("translate(640 0)"),
+        SVG.use("dot32_4").transform("translate(768 0)"),
+        SVG.use("dot32_4").transform("translate(896 0)")
+      ]).id("dot32_32"),
+      SVG.rect(), // filler to make the array size 8.
+      SVG.group([
+        SVG.use("dot32_32"),
+        SVG.use("dot32_32").transform("translate(0 32)"),
+        SVG.use("dot32_32").transform("translate(0 64)"),
+        SVG.use("dot32_32").transform("translate(0 96)")
+      ]).id("dot32_128"),
+      SVG.group([
+        SVG.use("dot32_128"),
+        SVG.use("dot32_128").transform("translate(0 128)"),
+        SVG.use("dot32_128").transform("translate(0 256)"),
+        SVG.use("dot32_128").transform("translate(0 384)"),
+        SVG.use("dot32_128").transform("translate(0 512)"),
+        SVG.use("dot32_128").transform("translate(0 640)"),
+        SVG.use("dot32_128").transform("translate(0 768)"),
+        SVG.use("dot32_128").transform("translate(0 896)")
+      ]).id("dot32_1024"),
+      SVG.mask("dot32mask",
+        SVG.list([
+          SVG.rect().fill("black"),
+          SVG.use("dot32_1024").fill("white")
+        ])
+      ),
+      SVG.group([
+        SVG.rect().fill("#d5d7e1"),
+        SVG.use(tag0).mask("dot32mask")
+      ]).id(tag)
+    ]).svg());
   }
 }

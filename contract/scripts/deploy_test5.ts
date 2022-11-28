@@ -1,18 +1,25 @@
 import { ethers, network } from "hardhat";
 import { writeFile } from "fs";
+import addresses from '@nouns/sdk/dist/contract/addresses.json';
 
 const nounsDescriptor:string = (network.name == "goerli") ?
-  "0x4d1e7066EEbA8F6c86033F3728C004E71328326D": 
-  "0x0Cfdb3Ba1694c2bb2CFACB0339ad7b1Ae5932B63";
+  addresses[5].nounsDescriptor: addresses[1].nounsDescriptor;
+const nounsToken:string = (network.name == "goerli") ?
+  addresses[5].nounsToken: addresses[1].nounsToken;
 
 async function main() {
   const factoryNouns = await ethers.getContractFactory("NounsAssetProvider");
-  const nouns = await factoryNouns.deploy(nounsDescriptor);
+  const nouns = await factoryNouns.deploy(nounsToken, nounsDescriptor);
   await nouns.deployed();
   console.log(`      nouns="${nouns.address}"`);
 
+  const factoryDotNouns = await ethers.getContractFactory("DotProvider");
+  const dotNouns = await factoryDotNouns.deploy(nouns.address);
+  await dotNouns.deployed();
+  console.log(`      nouns="${dotNouns.address}"`);
+
   const factory = await ethers.getContractFactory("SVGTest5Nouns");
-  const contract = await factory.deploy(nouns.address);
+  const contract = await factory.deploy(nouns.address, dotNouns.address);
   await contract.deployed();
 
   const result = await contract.main();
