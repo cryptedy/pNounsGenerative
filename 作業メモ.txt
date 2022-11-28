@@ -39,7 +39,8 @@ git fetch upstream
 
 # masterブランチをチェックアウトしフォーク元の差分をマージします。
 git checkout main
-git merge upstream/main
+
+
 
 # 最後に自分の修正ブランチに master ブランチを取り込みます。コンフリクトが出たら解決します。
 git checkout 自分の修正ブランチ

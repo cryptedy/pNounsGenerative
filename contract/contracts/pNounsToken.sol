@@ -25,19 +25,6 @@ contract pNounsToken is pNounsContractFilter {
     address public treasuryAddress = 0x6Be0E4e7798430d92FE5e504B77F02C647D3eD23; // テスト用(gnosisテストネット)
     uint256 mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
 
-    // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
-    // address[] pNoundersAddress = [
-    //     // pNounders配布用
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000,
-    //     0x0000000000000000000000000000000000000000
-    // ];
-    // uint256 mintForPNoundersAddress = 4; // pNoundersへの初回配布数
     mapping(address => uint256) public mintCount; // アドレスごとのミント数
 
     constructor(IAssetProvider _assetProvider)
@@ -48,23 +35,12 @@ contract pNounsToken is pNounsContractFilter {
         mintLimit = 2100;
         admin = address(0); // TODO to be updated
 
-        // 一旦トレジャリーにミント後配布する方針。コントラクトには登録しない。
-        // for (uint256 i = 0; i < pNoundersAddress.length; i++) {
-        //     initMint(pNoundersAddress[i], mintForPNoundersAddress);
-        //     mintForTreasuryAddress -= mintForPNoundersAddress;
-        // }
-
         initMint(treasuryAddress, mintForTreasuryAddress);
-    }
 
-    ////////// コンストラクタ用  /////////////
-    function initMint(address _to, uint256 _num) private {
-        if (_to != address(0)) {
-            for (uint256 i; i < _num; i++) {
-                _safeMint(_to, nextTokenId++);
+            for (uint256 i; i < mintForTreasuryAddress; i++) {
+                _safeMint(treasuryAddress, nextTokenId++);
             }
-            mintCount[_to] += _num;
-        }
+            mintCount[treasuryAddress] += _num;
     }
 
     function mintPNouns(
