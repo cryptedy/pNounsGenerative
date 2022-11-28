@@ -12,8 +12,7 @@ import "./pNounsContractFilter.sol";
 contract pNounsToken is pNounsContractFilter {
     enum SalePhase {
         Locked,
-        PreSale1,
-        PreSale2,
+        PreSale,
         PublicSale
     }
     SalePhase public phase = SalePhase.Locked; // セールフェーズ
@@ -50,9 +49,7 @@ contract pNounsToken is pNounsContractFilter {
             // セールフェイズチェック
             if (phase == SalePhase.Locked) {
                 revert("Sale locked");
-            } else if (
-                phase == SalePhase.PreSale1 || phase == SalePhase.PreSale2
-            ) {
+            } else if (phase == SalePhase.PreSale) {
                 // マークルツリーが正しいこと
                 bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
                 require(
