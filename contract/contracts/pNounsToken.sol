@@ -35,12 +35,10 @@ contract pNounsToken is pNounsContractFilter {
         mintLimit = 2100;
         admin = address(0); // TODO to be updated
 
-        initMint(treasuryAddress, mintForTreasuryAddress);
-
-            for (uint256 i; i < mintForTreasuryAddress; i++) {
-                _safeMint(treasuryAddress, nextTokenId++);
-            }
-            mintCount[treasuryAddress] += _num;
+        for (uint256 i; i < mintForTreasuryAddress; i++) {
+            _safeMint(treasuryAddress, nextTokenId++);
+        }
+        mintCount[treasuryAddress] += mintForTreasuryAddress;
     }
 
     function mintPNouns(
@@ -87,12 +85,6 @@ contract pNounsToken is pNounsContractFilter {
 
         // ミント数カウントアップ
         mintCount[msg.sender] += _mintAmount;
-
-        // 潜在的な脆弱性リスク回避のため、withdraw関数を別途設ける
-        // // トレジャリーに送金
-        // if (treasuryAddress != address(0) && msg.value > 0) {
-        //     payable(treasuryAddress).transfer(msg.value);
-        // }
     }
 
     function withdraw() external onlyAdminOrOwner {
