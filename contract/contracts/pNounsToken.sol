@@ -20,20 +20,20 @@ contract pNounsToken is pNounsContractFilter {
     uint256 public purchaseUnit = 5; // 購入単位
 
     bytes32 public merkleRoot; // プレセールのマークルルート
+    address public treasuryAddress; // トレジャリーウォレット
     uint256 public maxMintPerAddress = 100; // 1人当たりの最大ミント数
-    // address public treasuryAddress = "0x8AE80e0B44205904bE18869240c2eC62D2342785"; // ミント代を転送する先のウォレット(gnosis)
-    address public treasuryAddress = 0x6Be0E4e7798430d92FE5e504B77F02C647D3eD23; // テスト用(gnosisテストネット)
     uint256 mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
 
     mapping(address => uint256) public mintCount; // アドレスごとのミント数
 
-    constructor(IAssetProvider _assetProvider)
+    constructor(IAssetProvider _assetProvider, address _treasuryAddress)
         pNounsContractFilter(_assetProvider, "pNouns NFT", "pNouns")
     {
         description = "This is the first NFT of pNouns project (https://pnouns.wtf/).";
         mintPrice = 0.05 ether;
         mintLimit = 2100;
         admin = address(0); // TODO to be updated
+        treasuryAddress = _treasuryAddress;
 
         for (uint256 i; i < mintForTreasuryAddress; i++) {
             _safeMint(treasuryAddress, nextTokenId++);

@@ -13,6 +13,9 @@ let unauthorized: any;
 let treasury: any;
 
 before(async () => {
+
+  [owner, authorized, unauthorized, treasury] = await ethers.getSigners();
+  
   const factoryHelper = await ethers.getContractFactory("SVGHelperA");
   contractHelper = await factoryHelper.deploy();
   await contractHelper.deployed();
@@ -26,10 +29,9 @@ before(async () => {
   await contractArt.deployed();
 
   const factoryToken = await ethers.getContractFactory("pNounsToken");
-  token = await factoryToken.deploy(contractArt.address);
+  token = await factoryToken.deploy(contractArt.address, treasury.address);
   await token.deployed();
 
-  [owner, authorized, unauthorized, treasury] = await ethers.getSigners();
 });
 
 const catchError = async (callback: any) => {
@@ -51,6 +53,11 @@ describe("pNounsToken constant values", function () {
   it("contractSplatter", async function () {
     const result = await contractSplatter.functions.generateSVGPart(1);
     expect(result.tag).equal("splt1");
+  });
+  // デプロイ後のトレジャリーミント
+  it("treasury mint", async function () {
+    const [count1] = await token.functions.balanceOf(treasury.address);
+    expect(count1.toNumber()).equal(100);
   });
   it("phase", async function () {
     await token.functions.setPhase(1, 5);
