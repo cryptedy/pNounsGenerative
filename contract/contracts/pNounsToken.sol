@@ -70,6 +70,8 @@ contract pNounsToken is pNounsContractFilter {
             // ミント数に応じた ETHが送金されていること
             uint256 cost = mintPrice * _mintAmount;
             require(cost <= msg.value, "insufficient funds");
+        } else {
+            require(msg.value == 0, "owners mint is free");
         }
 
         // 最大供給数に達していないこと
@@ -77,7 +79,7 @@ contract pNounsToken is pNounsContractFilter {
 
         // ミント
         for (uint256 i; i < _mintAmount; i++) {
-            _safeMint(msg.sender, nextTokenId+i);
+            _safeMint(msg.sender, nextTokenId + i);
         }
         nextTokenId += _mintAmount;
 

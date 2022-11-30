@@ -396,6 +396,35 @@ describe("pNounsToken Presale mint", function () {
 
     });
 
+    it("mint free error", async function () {
+      let tx, err;
+      await token.functions.setPhase(0, 5);
+      const [phase] = await token.functions.phase();
+      expect(phase).equal(0);
+      const [purchaseUnit] = await token.functions.purchaseUnit();
+      expect(purchaseUnit).equal(5)
+      const [mintPrice] = await token.functions.mintPrice();
+      expect(mintPrice).equal(ethers.utils.parseEther("0.05"));
+      const [count] = await token.functions.totalSupply();
+      const [mintLimit] = await token.functions.mintLimit();
+
+      // ownerを含まないマークルツリー
+    const tree = createTree([{ address: authorized.address },{ address: authorized2.address }]);
+      await token.functions.setMerkleRoot(tree.getHexRoot());
+
+      // ownerのマークルリーフ
+      const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [owner.address]));
+
+      err = await catchError(async () => {
+        // ミント代を設定
+        tx = await token.functions.mintPNouns( 1, proof, { value: mintPrice });
+        await tx.wait();
+      });
+
+      expect(err).equal("owners mint is free");
+
+    });
+
   });
 
 
