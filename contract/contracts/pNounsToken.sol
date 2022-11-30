@@ -71,7 +71,7 @@ contract pNounsToken is pNounsContractFilter {
             uint256 cost = mintPrice * _mintAmount;
             require(cost <= msg.value, "insufficient funds");
         } else {
-            require(msg.value == 0, "owners mint is free");
+            require(msg.value == 0, "owners mint price is free");
         }
 
         // 最大供給数に達していないこと
