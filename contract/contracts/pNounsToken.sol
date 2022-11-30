@@ -21,7 +21,7 @@ contract pNounsToken is pNounsContractFilter {
     bytes32 public merkleRoot; // プレセールのマークルルート
     address public treasuryAddress; // トレジャリーウォレット
     uint256 public maxMintPerAddress = 100; // 1人当たりの最大ミント数
-    uint256 mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
+    uint256 constant mintForTreasuryAddress = 100; // トレジャリーへの初回配布数
 
     mapping(address => uint256) public mintCount; // アドレスごとのミント数
 
@@ -64,7 +64,7 @@ contract pNounsToken is pNounsContractFilter {
             // アドレスごとのミント数上限チェック
             require(
                 mintCount[msg.sender] + _mintAmount <= maxMintPerAddress,
-                "exceeds number of earned Tokens"
+                "exceeds number of per address"
             );
 
             // ミント数に応じた ETHが送金されていること
