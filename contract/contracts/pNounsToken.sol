@@ -35,8 +35,10 @@ contract pNounsToken is pNounsContractFilter {
         treasuryAddress = _treasuryAddress;
 
         for (uint256 i; i < mintForTreasuryAddress; i++) {
-            _safeMint(treasuryAddress, nextTokenId++);
+            _safeMint(treasuryAddress, nextTokenId+i);
         }
+        nextTokenId += mintForTreasuryAddress;
+
         mintCount[treasuryAddress] += mintForTreasuryAddress;
     }
 
