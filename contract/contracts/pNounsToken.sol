@@ -58,7 +58,7 @@ contract pNounsToken is pNounsContractFilter {
                 // マークルツリーが正しいこと
                 bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
                 require(
-                    MerkleProof.verify(_merkleProof, merkleRoot, leaf),
+                    MerkleProof.verifyCalldata(_merkleProof, merkleRoot, leaf),
                     "Invalid Merkle Proof"
                 );
             }
