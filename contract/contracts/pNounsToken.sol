@@ -77,8 +77,9 @@ contract pNounsToken is pNounsContractFilter {
 
         // ミント
         for (uint256 i; i < _mintAmount; i++) {
-            _safeMint(msg.sender, nextTokenId++);
+            _safeMint(msg.sender, nextTokenId+i);
         }
+        nextTokenId += _mintAmount;
 
         // ミント数カウントアップ
         mintCount[msg.sender] += _mintAmount;
