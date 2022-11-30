@@ -221,6 +221,33 @@ describe("pNounsToken Presale mint", function () {
 
   });
 
+  it("Purchase Unit Error2", async function () {
+    let tx, err;
+
+    await token.functions.setPhase(1, 5); // phase:SalePhase.Presale, purchaceUnit:5 
+    const [phase] = await token.functions.phase();
+    expect(phase).equal(1);
+    const [purchaseUnit] = await token.functions.purchaseUnit();
+    expect(purchaseUnit).equal(5)
+
+    // authorized を含むマークルツリー
+    const tree = createTree([{ address: authorized.address },{ address: authorized2.address }]);
+    await token.functions.setMerkleRoot(tree.getHexRoot());
+
+    // authorizedのマークルリーフ
+    const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [authorized.address]));
+
+    const [mintPrice] = await token.functions.mintPrice();
+
+    err = await catchError(async () => {
+      // 購入単位5に対して、7をセット
+      tx = await token.connect(authorized).functions.mintPNouns(0, proof, { value: mintPrice.mul(7) });
+      await tx.wait();
+    });
+    expect(err).equal('Invalid purchaseUnit');
+
+  });
+
   it("Exceed number of per address Error", async function () {
     let tx, err;
 

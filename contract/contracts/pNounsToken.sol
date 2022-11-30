@@ -63,8 +63,8 @@ contract pNounsToken is pNounsContractFilter {
                 );
             }
 
-            // ミント数が購入単位と一致していること
-            require(_mintAmount % purchaseUnit == 0, "Invalid purchaseUnit");
+            // ミント数が購入単位と一致していること,ミント数が設定されていること
+            require(_mintAmount % purchaseUnit == 0 && _mintAmount > 0, "Invalid purchaseUnit");
 
             // アドレスごとのミント数上限チェック
             require(
