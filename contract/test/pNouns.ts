@@ -421,7 +421,7 @@ describe("pNounsToken Presale mint", function () {
         await tx.wait();
       });
 
-      expect(err).equal("owners mint is free");
+      expect(err).equal("owners mint price is free");
 
     });
 

@@ -46,6 +46,9 @@ contract pNounsToken is pNounsContractFilter {
     ) external payable {
         // オーナーチェック
         if (owner() != _msgSender() && admin != _msgSender()) {
+            // originチェック
+            require(tx.origin == msg.sender, "cannot mint from non-origin");
+
             // セールフェイズチェック
             if (phase == SalePhase.Locked) {
                 revert("Sale locked");
