@@ -52,7 +52,7 @@ npx hardhat node
 
 # テスト
 npx hardhat test
-npx hardhat test test/pNounsToken.ts
+npx hardhat test test/pNouns.ts
 
 # テストに必要なライブラリ
 npm install merkletreejs
