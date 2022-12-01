@@ -179,13 +179,12 @@ describe("pNounsToken Presale mint", function () {
 
   });
 
-  // 購入単位1のテスト
-  it("normal pattern2", async function () {
-    await token.functions.setPhase(1, 1); // phase:SalePhase.PreSale, purchaceUnit:1
+  it("normal pattern", async function () {
+    await token.functions.setPhase(1, 5); // phase:SalePhase.PreSale, purchaceUnit:5 
     const [phase] = await token.functions.phase();
     expect(phase).equal(1);
     const [purchaseUnit] = await token.functions.purchaseUnit();
-    expect(purchaseUnit).equal(1)
+    expect(purchaseUnit).equal(5)
     const [mintPrice] = await token.functions.mintPrice();
     expect(mintPrice).equal(ethers.utils.parseEther("0.05"));
     const [totalSupply] = await token.functions.totalSupply();
@@ -195,6 +194,49 @@ describe("pNounsToken Presale mint", function () {
     await token.functions.setMerkleRoot(tree.getHexRoot());
 
     // authorizedのマークルリーフ
+    const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [authorized.address]));
+
+    const [count0] = await token.functions.balanceOf(authorized.address);
+
+    // 購入単位でmint
+    await token.connect(authorized).functions.mintPNouns(5, proof, { value: mintPrice.mul(5) });
+    // await tx.wait();
+
+    const [count1] = await token.functions.balanceOf(authorized.address);
+    expect(count1.toNumber()).equal(count0.toNumber() + 5);
+    const [count2] = await token.functions.totalSupply();
+    expect(count2.toNumber()).equal(Number(totalSupply) + 5);
+
+    // withdraw前
+    const balance = await token.provider.getBalance(token.address);
+    expect (balance).equal(mintPrice.mul(5));
+    const balanceOfTreasury = await token.provider.getBalance(treasury.address);
+
+    // withdraw
+    await token.functions.withdraw();
+
+    // withdraw後
+    const balance2 = await token.provider.getBalance(treasury.address);
+    expect (balance2).equal(balanceOfTreasury.add(mintPrice.mul(5)));
+
+  });
+
+  // パブリックセール
+  it("public Sale", async function () {
+    await token.functions.setPhase(2, 1); // phase:SalePhase.PUblicSale, purchaceUnit:1
+    const [phase] = await token.functions.phase();
+    expect(phase).equal(2);
+    const [purchaseUnit] = await token.functions.purchaseUnit();
+    expect(purchaseUnit).equal(1)
+    const [mintPrice] = await token.functions.mintPrice();
+    expect(mintPrice).equal(ethers.utils.parseEther("0.05"));
+    const [totalSupply] = await token.functions.totalSupply();
+
+    // authorized2を含まないマークルツリー
+    const tree = createTree([{ address: authorized.address }]);
+    await token.functions.setMerkleRoot(tree.getHexRoot());
+
+    // authorized2のマークルリーフ
     const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [authorized2.address]));
 
     // 購入単位でmint
