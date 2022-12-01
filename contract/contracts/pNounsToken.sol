@@ -97,7 +97,7 @@ contract pNounsToken is pNounsContractFilter {
             treasuryAddress != address(0),
             "treasuryAddress shouldn't be 0"
         );
-        (bool sent, ) = treasuryAddress.call{value: address(this).balance}("");
+        (bool sent, ) = payable(treasuryAddress).call{value: address(this).balance}("");
         require(sent, "failed to move fund to treasuryAddress contract");
     }
 

@@ -164,6 +164,19 @@ describe("pNounsToken Presale mint", function () {
     expect(count1.toNumber()).equal(5);
     const [count2] = await token.functions.totalSupply();
     expect(count2.toNumber()).equal(Number(totalSupply) + 5);
+
+    // withdraw前
+    const balance = await token.provider.getBalance(token.address);
+    expect (balance).equal(mintPrice.mul(5));
+    const balanceOfTreasury = await token.provider.getBalance(treasury.address);
+
+    // withdraw
+    await token.functions.withdraw();
+
+    // withdraw後
+    const balance2 = await token.provider.getBalance(treasury.address);
+    expect (balance2).equal(balanceOfTreasury.add(mintPrice.mul(5)));
+
   });
 
   // 購入単位1のテスト
