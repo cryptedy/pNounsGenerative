@@ -62,6 +62,9 @@ contract pNounsToken is pNounsContractFilter {
                     "Invalid Merkle Proof"
                 );
             }
+            else if(phase == SalePhase.PublicSale){
+                // チェック不要
+            }
 
             // ミント数が購入単位と一致していること,ミント数が設定されていること
             require(_mintAmount % purchaseUnit == 0 && _mintAmount > 0, "Invalid purchaseUnit");
