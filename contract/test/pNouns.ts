@@ -35,17 +35,6 @@ before(async () => {
 
 });
 
-const catchError = async (callback: any) => {
-  try {
-    await callback();
-    console.log("unexpected success");
-    return false;
-  } catch (e: any) {
-    const array = e.reason.split("'");
-    return array.length == 3 ? array[1] : true;
-  }
-};
-
 describe("pNounsToken constant values", function () {
   it("contractHelper", async function () {
     const result = await contractHelper.functions.generateSVGPart(contractSplatter.address, 1);
@@ -131,11 +120,8 @@ describe("pNounsToken Presale mint", function () {
 
     const [mintPrice] = await token.functions.mintPrice();
 
-    err = await catchError(async () => {
-      tx = await token.connect(authorized).functions.mintPNouns(5, proof, { value: mintPrice.mul(5) });
-      await tx.wait();
-    });
-    expect(err).equal('Sale locked');
+    await expect(token.connect(authorized).functions.mintPNouns(5, proof, { value: mintPrice.mul(5) }))
+        .to.be.revertedWith("Sale locked")
 
   });
 
@@ -267,13 +253,8 @@ describe("pNounsToken Presale mint", function () {
 
     const [mintPrice] = await token.functions.mintPrice();
 
-    err = await catchError(async () => {
-      // 購入単位5に対して、7をセット
-      tx = await token.connect(authorized).functions.mintPNouns(7, proof, { value: mintPrice.mul(7) });
-      await tx.wait();
-    });
-    expect(err).equal('Invalid purchaseUnit');
-
+    await expect(token.connect(authorized).functions.mintPNouns(7, proof, { value: mintPrice.mul(7) }))
+        .to.be.revertedWith("Invalid purchaseUnit");
   });
 
   it("Purchase Unit Error2", async function () {
@@ -294,12 +275,8 @@ describe("pNounsToken Presale mint", function () {
 
     const [mintPrice] = await token.functions.mintPrice();
 
-    err = await catchError(async () => {
-      // 購入単位5に対して、7をセット
-      tx = await token.connect(authorized).functions.mintPNouns(0, proof, { value: mintPrice.mul(7) });
-      await tx.wait();
-    });
-    expect(err).equal('Invalid purchaseUnit');
+    await expect(token.connect(authorized).functions.mintPNouns(0, proof, { value: mintPrice.mul(7) }))
+        .to.be.revertedWith("Invalid purchaseUnit");
 
   });
 
@@ -327,12 +304,8 @@ describe("pNounsToken Presale mint", function () {
     const [count1] = await token.functions.balanceOf(authorized.address);
     expect(count1).equal(count0.add(50));
 
-    err = await catchError(async () => {
-      // 更に55個ミント
-      tx = await token.connect(authorized).functions.mintPNouns(55, proof, { value: mintPrice.mul(55) });
-      await tx.wait();
-    });
-    expect(err).equal('exceeds number of per address');
+    await expect(token.connect(authorized).functions.mintPNouns(55, proof, { value: mintPrice.mul(55) }))
+        .to.be.revertedWith("exceeds number of per address");
 
   });
 
@@ -354,12 +327,8 @@ describe("pNounsToken Presale mint", function () {
 
     const [mintPrice] = await token.functions.mintPrice();
 
-    err = await catchError(async () => {
-      // 購入単位5に対して、4つ分のETHをセット
-      tx = await token.connect(authorized2).functions.mintPNouns(5, proof, { value: mintPrice.mul(4) });
-      await tx.wait();
-    });
-    expect(err).equal('insufficient funds');
+    await expect(token.connect(authorized2).functions.mintPNouns(5, proof, { value: mintPrice.mul(4) }))
+        .to.be.revertedWith('insufficient funds');
 
   });
 
@@ -375,11 +344,9 @@ describe("pNounsToken Presale mint", function () {
 
     const [mintPrice] = await token.functions.mintPrice();
 
-    err = await catchError(async () => {
-      tx = await token.connect(unauthorized).functions.mintPNouns(5, proof, { value: mintPrice.mul(5) });
-      await tx.wait();
-    });
-    expect(err).equal('Invalid Merkle Proof');
+    await expect(token.connect(unauthorized).functions.mintPNouns(5, proof, { value: mintPrice.mul(5) }))
+    .to.be.revertedWith("Invalid Merkle Proof");
+
   });
 
   it("Sold out Error", async function () {
@@ -404,12 +371,8 @@ describe("pNounsToken Presale mint", function () {
 
     const [mintPrice] = await token.functions.mintPrice();
 
-    err = await catchError(async () => {
-      // 更に10個ミント
-      tx = await token.connect(authorized2).functions.mintPNouns(10, proof, { value: mintPrice.mul(10) });
-      await tx.wait();
-    });
-    expect(err).equal('Sold out');
+    await expect(token.connect(authorized2).functions.mintPNouns(10, proof, { value: mintPrice.mul(10) }))
+    .to.be.revertedWith("Sold out");
 
     tx = await token.setMintLimit(2100);
 
@@ -465,16 +428,11 @@ describe("pNounsToken Presale mint", function () {
       // ownerのマークルリーフ
       const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [owner.address]));
 
-      err = await catchError(async () => {
-        // 最大供給量を超過
-        tx = await token.functions.mintPNouns(mintLimit.toNumber() + 1, proof, { value: 0 });
-        await tx.wait();
-      });
-
+      await expect(token.functions.mintPNouns(mintLimit.toNumber() + 1, proof, { value: 0 }))
+      .to.be.revertedWith("Sold out");
+  
       const [count2] = await token.functions.totalSupply();
       const [mintLimit2] = await token.functions.mintLimit();
-
-      expect(err).equal('Sold out');
 
     });
 
@@ -497,13 +455,8 @@ describe("pNounsToken Presale mint", function () {
       // ownerのマークルリーフ
       const proof = tree.getHexProof(ethers.utils.solidityKeccak256(['address'], [owner.address]));
 
-      err = await catchError(async () => {
-        // ミント代を設定
-        tx = await token.functions.mintPNouns( 1, proof, { value: mintPrice });
-        await tx.wait();
-      });
-
-      expect(err).equal("owners mint price is free");
+      await expect(token.functions.mintPNouns( 1, proof, { value: mintPrice }))
+      .to.be.revertedWith("owners mint price is free");
 
     });
 
