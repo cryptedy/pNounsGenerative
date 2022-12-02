@@ -6,11 +6,11 @@
 
 pragma solidity ^0.8.6;
 
-import "./libs/ProviderToken2.sol";
+import "./libs/ProviderToken3.sol";
 import "contract-allow-list/contracts/proxy/interface/IContractAllowListProxy.sol";
 
 // contract pNounsToken is ProviderToken, ERC721P2P {
-contract pNounsContractFilter is ProviderToken2 {
+contract pNounsContractFilter is ProviderToken3 {
 
     address public admin; // コントラクト管理者。オーナーか管理者がset系メソッドを実行可能
 
@@ -22,7 +22,7 @@ contract pNounsContractFilter is ProviderToken2 {
         string memory _title,
         string memory _shortTitle
     )
-        ProviderToken2(_assetProvider, _title, _shortTitle)
+        ProviderToken3(_assetProvider, _title, _shortTitle)
     {}
 
     ////////// modifiers //////////
@@ -53,7 +53,7 @@ contract pNounsContractFilter is ProviderToken2 {
     function setApprovalForAll(address operator, bool approved)
         public
         virtual
-        override(ERC721WithOperatorFilter,IERC721) 
+        override(ERC721WithOperatorFilter,IERC721A) 
     {
         if (address(cal) != address(0)) {
             require(
@@ -66,8 +66,9 @@ contract pNounsContractFilter is ProviderToken2 {
 
     function approve(address to, uint256 tokenId)
         public
+        payable
         virtual
-        override(ERC721WithOperatorFilter,IERC721) 
+        override(ERC721WithOperatorFilter,IERC721A) 
     {
         if (address(cal) != address(0)) {
             require(cal.isAllowed(to, calLevel) == true, "address no list");

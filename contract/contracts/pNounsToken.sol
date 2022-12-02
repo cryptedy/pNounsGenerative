@@ -34,9 +34,10 @@ contract pNounsToken is pNounsContractFilter {
         admin = address(0); // TODO to be updated
         treasuryAddress = _treasuryAddress;
 
-        for (uint256 i; i < mintForTreasuryAddress; i++) {
-            _safeMint(treasuryAddress, nextTokenId+i);
-        }
+        // for (uint256 i; i < mintForTreasuryAddress; i++) {
+        //     _safeMint(treasuryAddress, nextTokenId+i);
+        // }
+        _safeMint(treasuryAddress, mintForTreasuryAddress);
         nextTokenId += mintForTreasuryAddress;
 
         mintCount[treasuryAddress] += mintForTreasuryAddress;
@@ -86,9 +87,10 @@ contract pNounsToken is pNounsContractFilter {
         require(totalSupply() + _mintAmount <= mintLimit, "Sold out");
 
         // ミント
-        for (uint256 i; i < _mintAmount; i++) {
-            _safeMint(msg.sender, nextTokenId + i);
-        }
+        // for (uint256 i; i < _mintAmount; i++) {
+        //     _safeMint(msg.sender, nextTokenId + i);
+        // }
+        _safeMint(msg.sender, _mintAmount);
         nextTokenId += _mintAmount;
 
         // ミント数カウントアップ
@@ -129,5 +131,9 @@ contract pNounsToken is pNounsContractFilter {
 
     function mint() public payable override returns (uint256) {
         revert("this function is not used");
+    }
+
+    function _startTokenId() internal view virtual override returns (uint256) {
+        return 1;
     }
 }
